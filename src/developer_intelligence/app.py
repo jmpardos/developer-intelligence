@@ -1,12 +1,26 @@
+from pathlib import Path
+
 import requests
 from flask import Flask, render_template, request
 
+from developer_intelligence.persistence.database import initialize_database
+from developer_intelligence.persistence.repository import RepositoryRepository
 from developer_intelligence.services.github import GitHubService
 
 
-def create_app():
+def create_app(test_config=None):
     # Crear y configurar la aplicación Flask.
     app = Flask(__name__)
+
+    database_path = Path(app.instance_path) / "developer_intelligence.db"
+    app.config["DATABASE_PATH"] = database_path
+
+    if test_config is not None:
+        app.config.update(test_config)
+
+    Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+
+    initialize_database(app.config["DATABASE_PATH"])
 
     @app.route('/')
     def index():
@@ -64,7 +78,21 @@ def create_app():
                 error="Unable to connect to GitHub",
             ), 502
 
+        repository_repo = RepositoryRepository(
+            app.config["DATABASE_PATH"]
+        )
+        repository_repo.save(repository_data)
+        
         # 4. Renderizar una plantilla con los resultados.
         return render_template("repository.html", repository=repository_data)
+
+    @app.route("/history", methods=["GET"])
+    def repository_history():
+        repository_repo = RepositoryRepository(
+            app.config["DATABASE_PATH"]
+        )
+        repositories = repository_repo.find_all()
+
+        return render_template("history.html", repositories=repositories)
 
     return app

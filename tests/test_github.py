@@ -9,6 +9,7 @@ from developer_intelligence.services.github import GitHubService
 def test_get_repository():
 
     github_response = {
+        "id": 12345,
         "name": "flask",
         "full_name": "pallets/flask",
         "description": "The Python micro framework",
@@ -31,6 +32,7 @@ def test_get_repository():
     mock_response.raise_for_status.assert_called_once()
 
     assert result == {
+        "github_id": 12345,
         "name": "flask",
         "full_name": "pallets/flask",
         "description": "The Python micro framework",

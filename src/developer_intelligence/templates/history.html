@@ -1,0 +1,31 @@
+<table>
+    <thead>
+        <tr>
+            <th>Repository</th>
+            <th>Language</th>
+            <th>Stars</th>
+            <th>Forks</th>
+            <th>Last analyzed</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if not repositories %}
+            <tr>
+                <td colspan="5">No repositories found.</td>
+            </tr>
+        {% else %}
+            {% for repository in repositories %}
+                <tr>
+                    <td>{{ repository.full_name }}</td>
+                    <td>{{ repository.language or "Unknown" }}</td>
+                    <td>{{ repository.stars }}</td>
+                    <td>{{ repository.forks }}</td>
+                    <td>{{ repository.updated_at }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+
+<a href="/">Back to search</a>

@@ -22,6 +22,7 @@ class GitHubService:
         data = response.json()
 
         return {
+            "github_id": data["id"],
             "name": data["name"],
             "full_name": data["full_name"],
             "description": data["description"],
