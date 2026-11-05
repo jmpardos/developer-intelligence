@@ -5,7 +5,7 @@ class GitHubService:
     BASE_URL = "https://api.github.com"
     TIMEOUT = 10
 
-    def __init__(self, session: None):
+    def __init__(self, session=None):
         self.session = session if session is not None else requests.Session()
         self.session.headers.update({"Accept": "application/vnd.github+json"})        
 

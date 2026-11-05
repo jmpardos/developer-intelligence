@@ -5,5 +5,24 @@
     <body>
         <h1>Welcome to Developer Intelligence</h1>
         <p>This is the home page of the Developer Intelligence application.</p>
+        <form action="/repositories" method="POST">
+            <label for="owner">Owner</label>
+            <input
+                type="text"
+                id="owner"
+                name="owner"
+                required
+            >
+
+            <label for="repo">Repository</label>
+            <input
+                type="text"
+                id="repo"
+                name="repo"
+                required
+            >
+            
+            <button type="submit">Analyze repository</button>
+        </form>
     </body>
 </html>
