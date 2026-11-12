@@ -30,5 +30,8 @@ class GitHubService:
             "stars": data["stargazers_count"],
             "forks": data["forks_count"],
             "open_issues": data["open_issues_count"],
+            "github_created_at": data["created_at"],
+            "github_pushed_at": data["pushed_at"],
+            "github_updated_at": data["updated_at"],        
         }
     

@@ -41,6 +41,9 @@ def test_analyze_repository(client):
         "stars": 100,
         "forks": 20,
         "open_issues": 5,
+        "github_created_at": "2020-01-01T00:00:00+00:00",
+        "github_pushed_at": "2023-01-01T00:00:00+00:00",
+        "github_updated_at": "2023-01-01T00:00+00:00",
     }
     
     with patch("developer_intelligence.app.GitHubService") as mock_service:
@@ -233,6 +236,9 @@ def test_analyze_repository_saves_data(client):
         "stars": 100,
         "forks": 20,
         "open_issues": 5,
+        "github_created_at": "2020-01-01T00:00:00+00:00",
+        "github_pushed_at": "2023-01-01T00:00:00+00:00",
+        "github_updated_at": "2023-01-01T00:00+00:00",
     }
 
     with (
@@ -269,6 +275,9 @@ def test_analyze_repository_persists_data(tmp_path):
         "stars": 100,
         "forks": 20,
         "open_issues": 5,
+        "github_created_at": "2020-01-01T00:00:00+00:00",
+        "github_pushed_at": "2023-01-01T00:00:00+00:00",
+        "github_updated_at": "2023-01-01T00:00+00:00",
     }
 
     with patch("developer_intelligence.app.GitHubService") as mock_github:
@@ -392,3 +401,104 @@ def test_homepage_has_history_link(client):
 
     assert response.status_code == 200
     assert b'href="/history"' in response.data
+
+
+def test_repository_details_displays_analytics(client):
+    repository_data = {
+        "github_id": 12345,
+        "name": "flask",
+        "full_name": "pallets/flask",
+        "description": "The Python micro framework",
+        "language": "Python",
+        "stars": 100,
+        "forks": 20,
+        "open_issues": 5,
+        "github_created_at": "2020-01-01T00:00:00+00:00",
+        "github_pushed_at": "2023-01-01T00:00:00+00:00",
+        "github_updated_at": "2023-01-01T00:00:00+00:00",
+    }
+
+    with patch("developer_intelligence.app.GitHubService") as mock_service:
+        mock_service.return_value.get_repository.return_value = repository_data
+
+        response = client.post("/repositories", data={"owner": "pallets", "repo": "flask"})
+
+        assert response.status_code == 200
+        assert b"Repository Analytics" in response.data
+        assert b"Repository age" in response.data
+        assert b"Average stars per year" in response.data
+
+
+    def test_repository_details_without_last_push(client):
+        repository_data = {
+            "github_id": 12345,
+            "name": "flask",
+            "full_name": "pallets/flask",
+            "description": "The Python micro framework",
+            "language": "Python",
+            "stars": 100,
+            "forks": 20,
+            "open_issues": 5,
+            "github_created_at": "2020-01-01T00:00:00+00:00",
+            "github_pushed_at": None,
+            "github_updated_at": "2023-01-01T00:00:00+00:00",
+        }
+
+        with patch("developer_intelligence.app.GitHubService") as mock_service:
+            mock_service.return_value.get_repository.return_value = repository_data
+
+            response = client.post("/repositories", data={"owner": "pallets", "repo": "flask"})
+
+            assert response.status_code == 200            
+            assert b"Not available" in response.data
+
+
+def test_analyze_repository_displays_analytics(client):
+    repository_data = {
+        "github_id": 12345,
+        "name": "flask",
+        "full_name": "pallets/flask",
+        "description": "The Python micro framework",
+        "language": "Python",
+        "stars": 100,
+        "forks": 20,
+        "open_issues": 5,
+        "github_created_at": "2020-01-01T00:00:00+00:00",
+        "github_pushed_at": "2023-01-01T00:00:00+00:00",
+        "github_updated_at": "2023-01-01T00:00+00:00",
+    }
+
+    with patch("developer_intelligence.app.GitHubService") as mock_service:
+        mock_service.return_value.get_repository.return_value = repository_data
+
+        response = client.post("/repositories", data={"owner": "pallets", "repo": "flask"})
+
+        assert response.status_code == 200
+        assert b"Repository Analytics" in response.data
+        assert b"Repository age" in response.data
+        assert b"Days since last push" in response.data
+        assert b"Average stars per year" in response.data
+
+
+def test_analyze_repository_without_last_push(client):
+    repository_data = {
+        "github_id": 12345,
+        "name": "flask",
+        "full_name": "pallets/flask",
+        "description": "The Python micro framework",
+        "language": "Python",
+        "stars": 100,
+        "forks": 20,
+        "open_issues": 5,
+        "github_created_at": "2020-01-01T00:00:00+00:00",
+        "github_pushed_at": None,
+        "github_updated_at": "2023-01-01T00:00:00+00:00",
+    }
+
+    with patch("developer_intelligence.app.GitHubService") as mock_service:
+        mock_service.return_value.get_repository.return_value = repository_data
+
+        response = client.post("/repositories", data={"owner": "pallets", "repo": "flask"})
+
+        assert response.status_code == 200            
+        assert b"Not available" in response.data

@@ -34,8 +34,8 @@ class RepositoryRepository:
         with closing(sqlite3.connect(self.database_path)) as connection:
             connection.execute(
                 """
-                INSERT INTO repositories (github_id, name, full_name, description, language, stars, forks, open_issues, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO repositories (github_id, name, full_name, description, language, stars, forks, open_issues, github_created_at, github_pushed_at, github_updated_at, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(github_id)
                 DO UPDATE SET
                     name = excluded.name,
@@ -45,6 +45,9 @@ class RepositoryRepository:
                     stars = excluded.stars,
                     forks = excluded.forks,
                     open_issues = excluded.open_issues,
+                    github_created_at = excluded.github_created_at,
+                    github_pushed_at = excluded.github_pushed_at,
+                    github_updated_at = excluded.github_updated_at,
                     updated_at = excluded.updated_at
                 """,
                 (
@@ -56,6 +59,9 @@ class RepositoryRepository:
                     repository_data["stars"],
                     repository_data["forks"],
                     repository_data["open_issues"],
+                    repository_data.get("github_created_at"),
+                    repository_data.get("github_pushed_at"),
+                    repository_data.get("github_updated_at"),
                     now,
                     now,
                 ),
