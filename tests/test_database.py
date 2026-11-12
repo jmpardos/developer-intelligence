@@ -119,37 +119,37 @@ def test_update_existing_repository(tmp_path):
         "open_issues": 5,
     }
 
-    # 1. Definimos dos fechas diferentes
+    # 1. Define two different dates.
     first_timestamp = datetime(2026, 1, 1, tzinfo=UTC)
     second_timestamp = datetime(2026, 1, 2, tzinfo=UTC)
 
-    # 2. Primera inserción
+    # 2. First insertion.
     with patch(
         "developer_intelligence.persistence.repository.datetime"
     ) as mock_datetime:
         mock_datetime.now.return_value = first_timestamp
         repository_repo.save(repository_data)
 
-    # 3. Recuperamos el registro original
+    # 3. Retrieve the original record.
     original_repository = repository_repo.find_by_github_id(12345)
 
     assert original_repository is not None
     assert original_repository["created_at"] == first_timestamp.isoformat()
     assert original_repository["updated_at"] == first_timestamp.isoformat()
 
-    # 4. Segunda inserción: debe actualizar el registro existente
+    # 4. Second insertion: it should update the existing record.
     with patch(
         "developer_intelligence.persistence.repository.datetime"
     ) as mock_datetime:
         mock_datetime.now.return_value = second_timestamp
         repository_repo.save(updated_repository_data)
 
-    # 5. Recuperamos el registro actualizado
+    # 5. Retrieve the updated record.
     result = repository_repo.find_by_github_id(12345)
 
     assert result is not None
 
-    # 6. Comprobamos los datos actualizados
+    # 6. Verify the updated data.
     assert result["github_id"] == 12345
     assert result["name"] == "flask"
     assert result["full_name"] == "pallets/flask"
@@ -158,11 +158,11 @@ def test_update_existing_repository(tmp_path):
     assert result["forks"] == 20
     assert result["open_issues"] == 5
 
-    # 7. Comprobamos que no hay registros duplicados
+    # 7. Verify that there are no duplicate records.
     repositories = repository_repo.find_all()
     assert len(repositories) == 1
 
-    # 8. Comprobamos las fechas
+    # 8. Verify the dates.
     assert result["created_at"] == first_timestamp.isoformat()
     assert result["updated_at"] == second_timestamp.isoformat()
 
