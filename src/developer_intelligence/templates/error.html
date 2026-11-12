@@ -1,14 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Error - Developer Intelligence</title>
-</head>
-<body>
-    <h1>Something went wrong</h1>
 
-    <p>{{ error }}</p>
+{% extends "base.html" %}
 
-    <a href="/">Back to homepage</a>
-</body>
-</html>
+{% block title %}Error | Developer Intelligence{% endblock %}
+
+{% block content %}
+    
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="alert alert-danger shadow-sm" role="alert">
+            <h1 class="h4">Something went wrong</h1>
+
+            <p class="mb-0">
+                {{ error }}
+            </p>
+        </div>
+
+        <a href="/" class="btn btn-outline-primary">
+            ← Back to search
+        </a>
+    </div>
+</div>
+
+{% endblock %}

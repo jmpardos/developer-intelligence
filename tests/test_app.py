@@ -54,9 +54,12 @@ def test_analyze_repository(client):
         assert response.status_code == 200
         assert b"pallets/flask" in response.data
         assert b"Python" in response.data
-        assert b"Stars: 100" in response.data
-        assert b"Forks: 20" in response.data
-        assert b"Open Issues: 5" in response.data
+        assert b"Stars" in response.data
+        assert b"100" in response.data
+        assert b"Forks" in response.data
+        assert b"20" in response.data
+        assert b"Open Issues" in response.data
+        assert b"5" in response.data
 
         mock_service.return_value.get_repository.assert_called_once_with(
             "pallets",
@@ -425,8 +428,8 @@ def test_repository_details_displays_analytics(client):
 
         assert response.status_code == 200
         assert b"Repository Analytics" in response.data
-        assert b"Repository age" in response.data
-        assert b"Average stars per year" in response.data
+        assert b"Repository Age" in response.data
+        assert b"Average Stars per Year" in response.data
 
 
     def test_repository_details_without_last_push(client):
@@ -475,9 +478,9 @@ def test_analyze_repository_displays_analytics(client):
 
         assert response.status_code == 200
         assert b"Repository Analytics" in response.data
-        assert b"Repository age" in response.data
-        assert b"Days since last push" in response.data
-        assert b"Average stars per year" in response.data
+        assert b"Repository Age" in response.data
+        assert b"Days Since Last Push" in response.data
+        assert b"Average Stars per Year" in response.data
 
 
 def test_analyze_repository_without_last_push(client):
@@ -502,3 +505,11 @@ def test_analyze_repository_without_last_push(client):
 
         assert response.status_code == 200            
         assert b"Not available" in response.data
+
+
+def test_homepage_contains_navigation(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert b"Developer Intelligence" in response.data
+    assert b'href="/history"' in response.data

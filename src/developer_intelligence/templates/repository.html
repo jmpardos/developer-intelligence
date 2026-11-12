@@ -1,36 +1,102 @@
-<h1>{{ repository.full_name }}</h1>
+{% extends "base.html" %}
 
-<p>{{ repository.description }}</p>
+{% block title %}Repository Details | Developer Intelligence{% endblock %}
 
-<p>Language: {{ repository.language }}</p>
-<p>Stars: {{ repository.stars }}</p>
-<p>Forks: {{ repository.forks }}</p>
-<p>Open Issues: {{ repository.open_issues }}</p>
-<p>Name: {{ repository.name }}</p>
+{% block content %}
 
-<section>
-    <h2>Repository Analytics</h2>
+<div class="mb-4">
+    <h1 class="fw-bold">Repository Analysis</h1>
+    <p class="text-muted">
+        Explore repository information and activity metrics.
+    </p>
+</div>
 
-    <ul>
-        <li>
-            Repository age:
-            {{ analytics.repository_age_days }} days
-        </li>
+<div class="card shadow-sm mb-5">
+    <div class="card-body p-4">
+        <h2 class="h4">
+            {{ repository.full_name }}
+        </h2>
+        <p class="text-muted">
+            {{ repository.description or "No description available." }}
+        </p>
+        <span class="badge bg-secondary">
+            {{ repository.language or "Unknown language" }}
+        </span>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <strong>Stars</strong>
+                <p>{{ repository.stars }}</p>
+            </div>
+            <div class="col-md-4">
+                <strong>Forks</strong>
+                <p>{{ repository.forks }}</p>
+            </div>
+            <div class="col-md-4">
+                <strong>Open Issues</strong>
+                <p>{{ repository.open_issues }}</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <li>
-            Days since last push:
-            {% if analytics.days_since_last_push is none %}
-                Not available
-            {% else %}
-                {{ analytics.days_since_last_push }} days
-            {% endif %}
-        </li>
+<h2 class="h4 mb-4">Repository Analytics</h2>
 
-        <li>
-            Average stars per year:
-            {{ analytics.stars_per_year }}
-        </li>
-    </ul>
-</section>
+<div class="row g-3">
 
-<a href="/">Back to homepage</a>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h3 class="h6 text-muted">Repository Age</h3>
+
+                <p class="fs-3 fw-bold mb-0">
+                    {{ analytics.repository_age_days }}
+                </p>
+
+                <small class="text-muted">days</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h3 class="h6 text-muted">Days Since Last Push</h3>
+
+                <p class="fs-3 fw-bold mb-0">
+                    {% if analytics.days_since_last_push is none %}
+                        Not available
+                    {% else %}
+                        {{ analytics.days_since_last_push }}
+                    {% endif %}
+                </p>
+
+                <small class="text-muted">days</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h3 class="h6 text-muted">Average Stars per Year</h3>
+
+                <p class="fs-3 fw-bold mb-0">
+                    {% if analytics.stars_per_year is none %}
+                        Not available
+                    {% else %}
+                        {{ analytics.stars_per_year }}
+                    {% endif %}
+                </p>
+
+                <small class="text-muted">stars/year</small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="mt-4">
+    <a href="/" class="btn btn-outline-primary">
+        ← Analyze another repository
+    </a>
+</div>
+
+{% endblock %}
