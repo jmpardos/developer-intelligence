@@ -1,3 +1,6 @@
+# AI assistance: ChatGPT provided guidance on GitHub API integration,
+# HTTP exception handling, and testability through session injection.
+# The implementation was developed and validated by the author.
 import requests
 
 

@@ -1,3 +1,6 @@
+# AI assistance: ChatGPT was used to discuss analytics calculations,
+# timezone handling, edge cases, and automated testing.
+# The implementation was developed and validated by the author.
 from datetime import datetime
 
 

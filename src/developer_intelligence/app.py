@@ -1,3 +1,6 @@
+# AI assistance: ChatGPT was used for guidance on Flask application
+# architecture, HTTP error handling, and code review.
+# The implementation was developed and validated by the author.
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
