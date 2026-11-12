@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
@@ -5,11 +6,11 @@ from flask import Flask, render_template, request
 
 from developer_intelligence.persistence.database import initialize_database
 from developer_intelligence.persistence.repository import RepositoryRepository
+from developer_intelligence.services.analytics import RepositoryAnalyticsService
 from developer_intelligence.services.github import GitHubService
 
 
 def create_app(test_config=None):
-    # Crear y configurar la aplicación Flask.
     app = Flask(__name__)
 
     database_path = Path(app.instance_path) / "developer_intelligence.db"
@@ -28,7 +29,6 @@ def create_app(test_config=None):
 
     @app.route("/repositories", methods=["POST"])
     def analyze_repository():
-        # 1. Recuperar owner y repo del formulario.
         owner = request.form.get("owner", "").strip()
         repo = request.form.get("repo", "").strip()
 
@@ -38,10 +38,8 @@ def create_app(test_config=None):
                 error="Owner and repository are required",
             ), 400
 
-        # 2. Crear una instancia de GitHubService.
         github_service = GitHubService()
 
-        # 3. Consultar el repositorio.    
         try:
             repository_data = github_service.get_repository(owner, repo)
         except requests.exceptions.Timeout:
@@ -82,9 +80,15 @@ def create_app(test_config=None):
             app.config["DATABASE_PATH"]
         )
         repository_repo.save(repository_data)
+
+        analytics_service = RepositoryAnalyticsService(datetime.now(UTC))
+        analytics = {
+            "repository_age_days": analytics_service.repository_age_days(repository_data["github_created_at"]),
+            "days_since_last_push": analytics_service.days_since_last_push(repository_data["github_pushed_at"]),
+            "stars_per_year": analytics_service.stars_per_year(repository_data["stars"], repository_data["github_created_at"]),
+        }
         
-        # 4. Renderizar una plantilla con los resultados.
-        return render_template("repository.html", repository=repository_data)
+        return render_template("repository.html", repository=repository_data, analytics=analytics)
 
     @app.route("/history", methods=["GET"])
     def repository_history():

@@ -17,6 +17,9 @@ def test_get_repository():
         "stargazers_count": 100,
         "forks_count": 20,
         "open_issues_count": 5,
+        "created_at": "2020-01-01T00:00:00Z",
+        "pushed_at": "2026-11-01T00:00:00Z",
+        "updated_at": "2026-11-02T00:00:00Z",
     }
 
     mock_response = MagicMock()
@@ -40,6 +43,9 @@ def test_get_repository():
         "stars": 100,
         "forks": 20,
         "open_issues": 5,
+        "github_created_at": "2020-01-01T00:00:00Z",
+        "github_pushed_at": "2026-11-01T00:00:00Z",
+        "github_updated_at": "2026-11-02T00:00:00Z",
     }
 
     mock_session.get.assert_called_once_with(
