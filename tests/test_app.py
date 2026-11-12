@@ -315,15 +315,15 @@ def test_analyze_repository_database_error(client):
         patch("developer_intelligence.app.GitHubService") as mock_github,
         patch("developer_intelligence.app.RepositoryRepository") as mock_repository,
     ):
-        # GitHub responde correctamente
+        # GitHub responds successfully.
         mock_github.return_value.get_repository.return_value = repository_data
 
-        # SQLite falla al intentar guardar
+        # SQLite fails while attempting to save.
         mock_repository.return_value.save.side_effect = (
             sqlite3.OperationalError("database is locked")
         )
 
-        # Comprobamos que Flask propaga la excepción
+        # Verify that Flask propagates the exception.
         response = client.post(
             "/repositories",
             data={"owner": "pallets", "repo": "flask"},
@@ -332,7 +332,7 @@ def test_analyze_repository_database_error(client):
         assert response.status_code == 500
         assert b"Unable to save repository data" in response.data
 
-        # Verificamos que se intentó guardar el repositorio
+        # Verify that saving the repository was attempted.
         mock_repository.return_value.save.assert_called_once_with(
             repository_data
         )
@@ -357,7 +357,7 @@ def test_history_displays_repositories(tmp_path):
 
     repository_repo = RepositoryRepository(database_path)
 
-    # 1. Crear dos diccionarios con datos de repositorios.
+    # 1. Create two dictionaries containing repository data.
     repository_data_1 = {
         "github_id": 12345,
         "name": "flask",
@@ -380,17 +380,17 @@ def test_history_displays_repositories(tmp_path):
         "open_issues": 10,
     }
 
-    # 2. Guardarlos utilizando repository_repo.save().
+    # 2. Save them using repository_repo.save().
     repository_repo.save(repository_data_1)
     repository_repo.save(repository_data_2)
 
-    # 3. Ejecutar GET /history.
+    # 3. Execute GET /history.
     response = client.get("/history")
 
-    # 4. Comprobar HTTP 200.
+    # 4. Verify the HTTP 200 response.
     assert response.status_code == 200
 
-    # 5. Comprobar que aparecen ambos repositorios.
+    # 5. Verify that both repositories are displayed.
     assert b"pallets/flask" in response.data
     assert b"django/django" in response.data
 
