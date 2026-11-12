@@ -1,5 +1,7 @@
 import sqlite3
 from contextlib import closing
+from datetime import UTC, datetime
+from unittest.mock import patch
 
 from developer_intelligence.persistence.database import initialize_database
 from developer_intelligence.persistence.repository import RepositoryRepository
@@ -94,6 +96,7 @@ def test_update_existing_repository(tmp_path):
     initialize_database(database_path)
 
     repository_repo = RepositoryRepository(database_path)
+
     repository_data = {
         "github_id": 12345,
         "name": "flask",
@@ -104,7 +107,6 @@ def test_update_existing_repository(tmp_path):
         "forks": 20,
         "open_issues": 5,
     }
-    repository_repo.save(repository_data)
 
     updated_repository_data = {
         "github_id": 12345,
@@ -116,11 +118,38 @@ def test_update_existing_repository(tmp_path):
         "forks": 20,
         "open_issues": 5,
     }
-    repository_repo.save(updated_repository_data)
 
+    # 1. Definimos dos fechas diferentes
+    first_timestamp = datetime(2026, 1, 1, tzinfo=UTC)
+    second_timestamp = datetime(2026, 1, 2, tzinfo=UTC)
+
+    # 2. Primera inserción
+    with patch(
+        "developer_intelligence.persistence.repository.datetime"
+    ) as mock_datetime:
+        mock_datetime.now.return_value = first_timestamp
+        repository_repo.save(repository_data)
+
+    # 3. Recuperamos el registro original
+    original_repository = repository_repo.find_by_github_id(12345)
+
+    assert original_repository is not None
+    assert original_repository["created_at"] == first_timestamp.isoformat()
+    assert original_repository["updated_at"] == first_timestamp.isoformat()
+
+    # 4. Segunda inserción: debe actualizar el registro existente
+    with patch(
+        "developer_intelligence.persistence.repository.datetime"
+    ) as mock_datetime:
+        mock_datetime.now.return_value = second_timestamp
+        repository_repo.save(updated_repository_data)
+
+    # 5. Recuperamos el registro actualizado
     result = repository_repo.find_by_github_id(12345)
 
     assert result is not None
+
+    # 6. Comprobamos los datos actualizados
     assert result["github_id"] == 12345
     assert result["name"] == "flask"
     assert result["full_name"] == "pallets/flask"
@@ -128,6 +157,14 @@ def test_update_existing_repository(tmp_path):
     assert result["stars"] == 150
     assert result["forks"] == 20
     assert result["open_issues"] == 5
+
+    # 7. Comprobamos que no hay registros duplicados
+    repositories = repository_repo.find_all()
+    assert len(repositories) == 1
+
+    # 8. Comprobamos las fechas
+    assert result["created_at"] == first_timestamp.isoformat()
+    assert result["updated_at"] == second_timestamp.isoformat()
 
 
 def test_find_all_empty(tmp_path):

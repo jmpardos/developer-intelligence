@@ -324,17 +324,13 @@ def test_analyze_repository_database_error(client):
         )
 
         # Comprobamos que Flask propaga la excepción
-        with pytest.raises(
-            sqlite3.OperationalError,
-            match="database is locked",
-        ):
-            client.post(
-                "/repositories",
-                data={
-                    "owner": "pallets",
-                    "repo": "flask",
-                },
-            )
+        response = client.post(
+            "/repositories",
+            data={"owner": "pallets", "repo": "flask"},
+        )
+
+        assert response.status_code == 500
+        assert b"Unable to save repository data" in response.data
 
         # Verificamos que se intentó guardar el repositorio
         mock_repository.return_value.save.assert_called_once_with(
@@ -406,7 +402,7 @@ def test_homepage_has_history_link(client):
     assert b'href="/history"' in response.data
 
 
-def test_repository_details_displays_analytics(client):
+def test_repository_details_without_last_push(client):
     repository_data = {
         "github_id": 12345,
         "name": "flask",
@@ -417,7 +413,7 @@ def test_repository_details_displays_analytics(client):
         "forks": 20,
         "open_issues": 5,
         "github_created_at": "2020-01-01T00:00:00+00:00",
-        "github_pushed_at": "2023-01-01T00:00:00+00:00",
+        "github_pushed_at": None,
         "github_updated_at": "2023-01-01T00:00:00+00:00",
     }
 
@@ -426,34 +422,8 @@ def test_repository_details_displays_analytics(client):
 
         response = client.post("/repositories", data={"owner": "pallets", "repo": "flask"})
 
-        assert response.status_code == 200
-        assert b"Repository Analytics" in response.data
-        assert b"Repository Age" in response.data
-        assert b"Average Stars per Year" in response.data
-
-
-    def test_repository_details_without_last_push(client):
-        repository_data = {
-            "github_id": 12345,
-            "name": "flask",
-            "full_name": "pallets/flask",
-            "description": "The Python micro framework",
-            "language": "Python",
-            "stars": 100,
-            "forks": 20,
-            "open_issues": 5,
-            "github_created_at": "2020-01-01T00:00:00+00:00",
-            "github_pushed_at": None,
-            "github_updated_at": "2023-01-01T00:00:00+00:00",
-        }
-
-        with patch("developer_intelligence.app.GitHubService") as mock_service:
-            mock_service.return_value.get_repository.return_value = repository_data
-
-            response = client.post("/repositories", data={"owner": "pallets", "repo": "flask"})
-
-            assert response.status_code == 200            
-            assert b"Not available" in response.data
+        assert response.status_code == 200            
+        assert b"Not available" in response.data
 
 
 def test_analyze_repository_displays_analytics(client):
@@ -513,3 +483,13 @@ def test_homepage_contains_navigation(client):
     assert response.status_code == 200
     assert b"Developer Intelligence" in response.data
     assert b'href="/history"' in response.data
+
+
+def test_repository_history_database_error(client):
+    with patch("developer_intelligence.app.RepositoryRepository") as mock_repository:
+        mock_repository.return_value.find_all.side_effect = sqlite3.OperationalError("database is locked")
+
+        response = client.get("/history")
+
+        assert response.status_code == 500
+        assert b"Unable to retrieve repository history" in response.data

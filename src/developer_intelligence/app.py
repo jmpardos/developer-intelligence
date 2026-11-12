@@ -1,3 +1,4 @@
+import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -79,7 +80,17 @@ def create_app(test_config=None):
         repository_repo = RepositoryRepository(
             app.config["DATABASE_PATH"]
         )
-        repository_repo.save(repository_data)
+        try:
+            repository_repo.save(repository_data)
+        except sqlite3.Error:
+            app.logger.exception("Failed to save repository data")
+            return (
+                render_template(
+                    "error.html",
+                    error="Unable to save repository data. Please try again later.",
+                ),
+                500,
+            )            
 
         analytics_service = RepositoryAnalyticsService(datetime.now(UTC))
         analytics = {
@@ -95,8 +106,19 @@ def create_app(test_config=None):
         repository_repo = RepositoryRepository(
             app.config["DATABASE_PATH"]
         )
-        repositories = repository_repo.find_all()
-
-        return render_template("history.html", repositories=repositories)
-
+        
+        try:
+            repositories = repository_repo.find_all()
+        except sqlite3.Error:
+            app.logger.exception("Failed to retrieve repository history")
+            return (
+                render_template(
+                    "error.html",
+                    error="Unable to retrieve repository history. Please try again later.",
+                ),
+                500,
+            ) 
+        
+        return render_template("history.html", repositories=repositories)  
+        
     return app
