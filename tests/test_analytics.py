@@ -1,3 +1,6 @@
+# AI assistance: ChatGPT was used to discuss test cases,
+# mocking strategies, and debugging of test failures.
+# Tests were implemented, reviewed, and executed by the author.
 from datetime import UTC, datetime
 
 from developer_intelligence.services.analytics import RepositoryAnalyticsService

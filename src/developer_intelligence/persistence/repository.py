@@ -1,3 +1,6 @@
+# AI assistance: ChatGPT provided guidance on SQLite persistence,
+# UPSERT operations, timestamp handling, and test design.
+# The implementation was developed and validated by the author.
 import sqlite3
 from contextlib import closing
 from datetime import UTC, datetime

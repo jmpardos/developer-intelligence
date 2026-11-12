@@ -1,3 +1,6 @@
+# AI assistance: ChatGPT was used to discuss test cases,
+# mocking strategies, and debugging of test failures.
+# Tests were implemented, reviewed, and executed by the author.
 from unittest.mock import MagicMock
 
 import pytest
