@@ -1,29 +1,59 @@
-<html>
-    <head>
-        <title>Developer Intelligence</title>   
-        </head>
-    <body>
-        <h1>Welcome to Developer Intelligence</h1>
-        <p>This is the home page of the Developer Intelligence application.</p>
-        <form action="/repositories" method="POST">
-            <label for="owner">Owner</label>
-            <input
-                type="text"
-                id="owner"
-                name="owner"
-                required
-            >
+{% extends "base.html" %}
 
-            <label for="repo">Repository</label>
-            <input
-                type="text"
-                id="repo"
-                name="repo"
-                required
-            >
-            
-            <button type="submit">Analyze repository</button>
-        </form>
-        <a href="/history">View analyzed repositories</a>
-    </body>
-</html>
+{% block title %}Search | Developer Intelligence{% endblock %}
+
+{% block content %}
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold">
+            GitHub Repository Analyzer
+        </h1>
+
+        <p class="lead text-muted">
+            Explore repository activity, popularity and maintenance indicators.
+        </p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form action="/repositories" method="POST">
+                        <div class="mb-3">
+                            <label for="owner" class="form-label">
+                                GitHub Owner
+                            </label>
+                            <input
+                                type="text"
+                                id="owner"
+                                name="owner"
+                                class="form-control"
+                                placeholder="e.g. pallets"
+                                required
+                            >
+                        </div>
+                        <div class="mb-3">
+                            <label for="repo" class="form-label">Repository</label>
+                            <input
+                                type="text"
+                                id="repo"
+                                name="repo"
+                                class="form-control"
+                                placeholder="e.g. flask"
+                                required
+                            >
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            Analyze Repository
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="/history">
+            View analyzed repositories
+        </a>
+    </div>
+{% endblock %}
