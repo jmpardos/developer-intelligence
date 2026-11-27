@@ -1,5 +1,7 @@
 # Developer Intelligence
 
+#### Video Demo: https://youtu.be/WZ3Yth5BpKM
+
 ## Project Overview
 
 Developer Intelligence is a web application developed as a final project for Harvard University's CS50x: Introduction to Computer Science.
